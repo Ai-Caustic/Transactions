@@ -12,49 +12,94 @@ class BankAccount:
         self.Balance = initialBalance
         self.Transactions = allTransactions
 
-    def makeDeposit(self, amount, date, note):
+    def make_deposit(self, amount, date, note):
         if amount < 0:
-            raise Exception("Amount must be positive")
+            raise ValueError("Amount must be positive")
 
         deposit = Transaction(amount, date, note)
         self.Transactions.append(deposit)
         self.Balance += amount
 
-    def makeWithdrawal(self, amount, date, note):
+    def make_withdrawal(self, amount, date, note):
         if amount <= 0:
-            raise Exception("Withdrawal must be greater than 0")
+            raise ValueError("Withdrawal must be greater than 0")
 
         if (self.Balance - amount < 0):
             raise RuntimeError("Insufficient funds to make withdrawal")
 
-        withdraw = Transaction(amount, date, note)
-        self.Transactions.append(withdraw)
+        withdrawal = Transaction(amount, date, note)
+        self.Transactions.append(withdrawal)
         self.Balance -= amount
 
-    def getBalance(self):
+    def get_balance(self):
         return self.Balance
 
-    def getLatestTransaction(self):
+    def get_latest_transaction(self):
         if self.Transactions:
             latest_transaction = self.Transactions[-1]
             return latest_transaction.Amount
         else:
             return None
 
+    def get_transaction_history(self):
+        if self.Transactions:
+            print("Transaction History")
+            for transaction in self.Transactions:
+                print(f'Amount: {transaction.Amount}')
+                print(f'Date: {transaction.Date}')
+                print(f'Note: {transaction.Note}')
+                print("-------------------")
 
-account = BankAccount("Bison", 0)
+        else:
+            print("No transaction found")
+
+    def transaction_summary(self):
+        if self.Transactions:
+
+            total_transactions = len(self.Transactions)
+            total_deposits = sum(
+                transaction.Amount for transaction in self.Transactions if transaction.Amount > 0)
+            total_withdrawals = abs(sum(
+                transaction.Amount for transaction in self.Transactions if transaction.Amount < 0))
+            average_transaction = sum(
+                transaction.Amount for transaction in self.Transactions) / total_transactions
+            percentage = int((sum(
+                transaction.Amount for transaction in self.Transactions) / 100) * total_transactions)
+
+            summary = {
+                'Total transactions': total_transactions,
+                'Total deposits': total_deposits,
+                'Total withdrawals': total_withdrawals,
+                'Average transaction amount': average_transaction,
+                'Percentage transactions': percentage
+            }
+            print(f'Total Transactions: {summary["Total transactions"]}')
+            return summary
+
+            # print("TRANSACTION SUMMARY:")
+            # print(f'Total transactions: {total_transactions}')
+            # print(f'Total deposits: {total_deposits}')
+            # print(f'Total withdrawals: {total_withdrawals}')
+            # print(f'Average transaction Amount: {average_transaction}')
+            # print(f'Percentage transactions: {percentage}%')
+        else:
+            print("No transactions found")
+
+
+account = BankAccount("Bison", 1000)
 print(
-    f'Account {account.Number} created for {account.Owner} with {account.Balance} initial Balance')
+    f'Account {account.Number} created for {account.Owner} with ${account.Balance} initial Balance')
 
-account.makeDeposit(200, "2023-06-25", "Yessir")
-account.makeDeposit(600, "2023-06-25", "Dinner")
-account.makeWithdrawal(1000, "2023-06-25", "Broke")
+account.make_deposit(200, "2023-06-25", "Bought a cake")
+account.make_deposit(600, "2023-06-25", "Dinner")
+account.make_withdrawal(1000, "2023-06-25", "Broke")
 
-latest_amount = account.getLatestTransaction()
-balance = account.getBalance()
+latest_amount = account.get_latest_transaction()
+balance = account.get_balance()
 
-
-print(latest_amount)
-print(balance)
-
+print(f'Latest transaction was ${latest_amount}')
+print(f'Balance is ${balance}')
+print("------------------")
+account.get_transaction_history()
+account.transaction_summary()
 # print(date.today())
